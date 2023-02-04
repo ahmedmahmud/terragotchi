@@ -46,6 +46,9 @@ app.post('/terra_hook', async (req, res) => {
     case "activity":
       decay_scores(req.body.user.user_id)
       load_activity_data(req.body.user.user_id, req.body.MET_data)
+    case "sleep":
+      process_sleep_data(req.body.user.user_id, req.body.data[0].sleep_durations_data.asleep)
+      break
     default:
       break
   }
@@ -80,7 +83,7 @@ let decay_scores = (uid) => {
   let delta = Math.max(time - db.data[uid].timestamp, 0)
   user.health = Math.max(user.health - delta * 0.0001, 0)
   user.planet = Math.max(user.planet - delta * 0.0001, 0)
-
+  user.sleep = Math.max(user.sleep - delta * 0.001, 0)
 }
 
 let check_scores = (uid) => {
@@ -89,6 +92,8 @@ let check_scores = (uid) => {
   user.health = Math.max(user.health, 0)
   user.planet = Math.min(user.planet, 100)
   user.planet = Math.max(user.planet, 0)
+  user.sleep = Math.min(user.sleep, 100)
+  user.sleep = Math.max(user.sleep, 0)
 }
 
 let register_user = (uid) => {
@@ -98,6 +103,7 @@ let register_user = (uid) => {
     db.data[uid] = {
       "health": 0,
       "planet": 0,
+      "sleep": 0,
       "timestamp": time
     }
     console.log(`🔧 Successfully registered ${color.magenta(uid)} to the database!`)
@@ -124,6 +130,17 @@ let load_activity_data = (uid, data) => {
 
   db.data[uid].health += score
   console.log(`🏋️ ${color.magenta(old_uid)} completed an activity, updating scores!`)
+}
+
+let process_sleep_data = (uid, data) => {
+  let light = data.duration_light_sleep_state_seconds
+  let normal = data.duration_asleep_state_seconds
+  let deep = data.duration_deep_sleep_state_seconds
+  let REM = data.duration_REM_sleep_state_seconds
+  let total = light + normal + deep + REM
+
+  db.data[uid].sleep += (total / 3600) * 10
+  db.data[uid].sleep = Math.min(100, db.data[uid].sleep)
 }
 
 let inc_recycle = (uid) => {
