@@ -30,53 +30,53 @@ app.get('/', (req, res) => {
   res.send('🌍 Terragotchi 🌍')
 })
 
-app.get('/get_values/:user_id', (req, res) => {
-  res.json(db.data[req.params.user_id])
+app.get('/get_values/:reference_id', (req, res) => {
+  res.json(db.data[req.params.reference_id])
 })
 
 // ---- POST HANDLERS ---- //
 app.post('/terra_hook', async (req, res) => {
   switch (req.body.type) {
     case "auth":
-      register_user(req.body.user.user_id)
+      register_user(req.body.user.reference_id)
       break
     case "user_reauth":
-      update_user(req.body.old_user.user_id, req.body.new_user.user_id)
+      update_user(req.body.old_user.reference_id, req.body.new_user.reference_id)
       break
     case "activity":
-      decay_scores(req.body.user.user_id)
-      load_activity_data(req.body.user.user_id, req.body.MET_data)
+      decay_scores(req.body.user.reference_id)
+      load_activity_data(req.body.user.reference_id, req.body.MET_data)
     case "sleep":
-      process_sleep_data(req.body.user.user_id, req.body.data[0].sleep_durations_data.asleep)
+      process_sleep_data(req.body.user.reference_id, req.body.data[0].sleep_durations_data.asleep)
       break
     default:
       break
   }
-  check_scores(req.body.user.user_id)
+  check_scores(req.body.user.reference_id)
   res.sendStatus(200)
   await db.write()
 })
 
-app.post('/send_action/:user_id', async (req, res) => {
-  decay_scores(req.params.user_id)
+app.post('/send_action/:reference_id', async (req, res) => {
+  decay_scores(req.params.reference_id)
   switch (req.body.type) {
     case "recycle":
-      inc_recycle(req.params.user_id)
+      inc_recycle(req.params.reference_id)
       res.sendStatus(200)
       break
     case "journey":
-      update_transport(req.params.user_id, req.body.mode)
+      update_transport(req.params.reference_id, req.body.mode)
       res.sendStatus(200)
       break
     case "meal":
-      update_meal(req.params.user_id, req.body.category)
+      update_meal(req.params.reference_id, req.body.category)
       res.sendStatus(200)
       break
     default:
       res.sendStatus(404)
       break
   }
-  check_scores(req.params.user_id)
+  check_scores(req.params.reference_id)
   await db.write()
 })
 
