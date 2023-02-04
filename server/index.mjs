@@ -61,13 +61,17 @@ app.post('/send_action/:user_id', async (req, res) => {
   decay_scores(req.params.user_id)
   switch (req.body.type) {
     case "recycle":
-      // reward user for recycling
       inc_recycle(req.params.user_id)
       res.sendStatus(200)
       break
-    case "summary":
-      report_daily_summary(req.params.user_id, req.body)
+    case "journey":
+      update_transport(req.params.user_id, req.body.mode)
       res.sendStatus(200)
+      break
+    case "meal":
+      update_meal(req.params.user_id, req.body.category)
+      res.sendStatus(200)
+      break
     default:
       res.sendStatus(404)
       break
@@ -148,43 +152,56 @@ let inc_recycle = (uid) => {
   console.log(db.data)
 }
 
-let report_daily_summary = (uid, data) => {
-  let dbe = db.data[uid]
-  let score = 0
-  score += calculate_transport_score(data.transport)
+let update_transport = (uid, mode) => {
+  let user = db.data[uid]
 
-  if (data.recycled == true) {
-    score += 10
+  switch (mode) {
+    case "walk":
+      user.planet += 10
+      break
+    case "cycle":
+      user.planet += 10
+      break
+    case "bus":
+      user.planet += 5
+      break
+    case "car":
+      user.planet -= 10
+    default:
+      break
   }
-
-  score += data.meals.map(calculate_meal_score).reduce((sum, a) => sum + a, 0)
-  dbe.planet += score
-  console.log(db.data)
 }
 
-let calculate_transport_score = (transport) => {
-  let score = 0
-  if (transport.includes("walk")) {
-    score += 10
-  } if (transport.includes("cycle")) {
-    score += 10
-  } if (transport.includes("bus")) {
-    score += 5
-  } if (transport.includes("car")) {
-    score -= 20
-  }
-  return score
-}
-
-let calculate_meal_score = (meal) => {
-  switch (meal) {
+let update_meal = (uid, method, category) => {
+  let user = db.data[uid]
+  switch (method) {
     case "self":
-      return 10
+      user.planet += 10
       break;
     case "bought":
-      return -5
+      user.planet -= 5
+      break
     case "delivery":
-      return -15
+      user.planet -= 15
+      break
+    default:
+      break
+  }
+
+  switch (category) {
+    case "red meat":
+      user.planet -= 5
+      break
+    case "fish":
+      user.planet -= 2
+      break
+    case "fish":
+      break
+    case "vegetarian":
+      user.planet += 5
+      break
+    default:
+      break
   }
 }
 
