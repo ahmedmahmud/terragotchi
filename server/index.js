@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
   res.send('Terragotchi server')
 })
 
-app.get('/terra_hook', (req, res) => {
+app.post('/terra_hook', (req, res) => {
   res.setHeader('Content-Type', 'text/plain')
   res.write('you posted:\n')
   res.end(JSON.stringify(req.body, null, 2))
