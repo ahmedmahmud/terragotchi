@@ -132,3 +132,16 @@ calculate_meal_score = (meal) => {
       return -15
   }
 }
+
+const color = {
+  reset: "\x1b[0m",
+  black: (msg) => `\x1b[30m${msg}${color.reset}`,
+  red: (msg) => `\x1b[31m${msg}${color.reset}`,
+  green: (msg) => `\x1b[32m${msg}${color.reset}`,
+  yellow: (msg) => `\x1b[33m${msg}${color.reset}`,
+  blue: (msg) => `\x1b[34m${msg}${color.reset}`,
+  magenta: (msg) => `\x1b[35m${msg}${color.reset}`,
+  cyan: (msg) => `\x1b[36m${msg}${color.reset}`,
+  white: (msg) => `\x1b[37m${msg}${color.reset}`,
+  gray: (msg) => `\x1b[90m${msg}${color.reset}`,
+}
