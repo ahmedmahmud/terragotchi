@@ -12,12 +12,9 @@ class Splash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Splash Screen',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: const SplashPage(),
+      home: SplashPage(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -35,7 +32,7 @@ class _MySplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     Timer(
-        const Duration(seconds: 1),
+        const Duration(seconds: 2),
         () => Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => const MyApp())));
   }
@@ -43,15 +40,23 @@ class _MySplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: primaryColor,
       child: Container(
-        height: 60.0,
         width: 60.0,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/alien.png'),
+        child: Column(children: <Widget>[
+          const SizedBox(height: 120),
+          Image.asset(
+            'assets/images/alien.png',
+            fit: BoxFit.cover,
+            // width: 200,
           ),
-        ),
+          const SizedBox(height: 120),
+          Image.asset(
+            'assets/images/terra.png',
+            fit: BoxFit.cover,
+            width: 200,
+          ),
+        ]),
       ),
     );
   }

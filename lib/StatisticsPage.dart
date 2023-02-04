@@ -1,56 +1,25 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'AccountPage.dart';
 import 'EnvironmentPage.dart';
-import 'StatisticsPage.dart';
+import 'AccountPage.dart';
+import 'home.dart';
 
-Color? primaryColor = Colors.deepPurpleAccent[100];
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'TerraGotchi App',
-      theme: ThemeData(
-        primaryColor: primaryColor,
-        scaffoldBackgroundColor: primaryColor,
-      ),
-      home: const MyHomePage(title: 'terragotchi'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  // returns a list of scores, each representing a category
-  Stack getImage(List<int> scores) {
-    return Stack(children: [
-      Image.asset('assets/images/earth${scores[0]}.png'),
-      Image.asset('assets/images/mood${scores[1]}.png'),
-    ]);
-  }
+class StatisticsWidget extends StatefulWidget {
+  const StatisticsWidget({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<StatisticsWidget> createState() => StatisticsPage();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class StatisticsPage extends State<StatisticsWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
+        title: const Padding(
+          padding: EdgeInsets.only(top: 20.0),
           child: Text(
-            widget.title,
-            style: const TextStyle(fontFamily: 'Space Mono', fontSize: 28),
+            'statistics',
+            style: TextStyle(fontFamily: 'Space Mono', fontSize: 28),
           ),
         ),
         backgroundColor: primaryColor,
@@ -62,8 +31,14 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Current total score: ${EnvironmentPage.totalScore.round()}',
-              style: TextStyle(fontFamily: 'Space Mono', fontSize: 18),
+              'Environment score: ${EnvironmentPage.totalScore.round()}',
+              style: const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
+            ),
+            Slider(
+              value: EnvironmentPage.envScore,
+              max: 100,
+              label: EnvironmentPage.envScore.round().toString(),
+              onChanged: null,
             ),
           ],
         ),
@@ -100,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ).then((value) => setState(() {}));
           }
         },
+
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.camera),
