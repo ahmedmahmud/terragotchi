@@ -12,9 +12,15 @@ app.get('/', (req, res) => {
 })
 
 app.post('/terra_hook', (req, res) => {
-  res.setHeader('Content-Type', 'text/plain')
-  res.write('you posted:\n')
-  res.end(JSON.stringify(req.body, null, 2))
+  switch (req.body.type) {
+    case "user":
+      
+      break;
+  
+    default:
+      break;
+  }
+  res.end(JSON.stringify(req.body.type, null, 2))
 })
 
 app.listen(port, () => {
