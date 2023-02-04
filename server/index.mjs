@@ -1,24 +1,40 @@
-const express = require('express')
-const bodyParser = require('body-parser')
+// ---- IMPORTS ---- //
+import express from 'express'
+import bodyParser from 'body-parser'
+import { Low } from 'lowdb'
+import { JSONFile } from 'lowdb/node'
 
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// ---- DATABASE SETUP ---- //
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const file = join(__dirname, 'db.json')
+
+const adapter = new JSONFile(file)
+const db = new Low(adapter)
+
+await db.read()
+db.data ||= {}
+
+// ---- SERVER SETUP ---- //
 const app = express()
 const port = 3000
 
-let db = {
-  "1": {
-    "health": 50,
-    "environment": 50
-  }
-}
-
-// parse application/json
+// ---- MIDDLEWARE ---- //
 app.use(bodyParser.json())
 
+// ---- GET HANDLERS ---- //
 app.get('/', (req, res) => {
-  res.send('Terragotchi server')
+  res.send('🌍 Terragotchi 🌍')
 })
 
-app.post('/terra_hook', (req, res) => {
+app.get('/get_values/:user_id', (req, res) => {
+  res.json(db.data[req.params.user_id])
+})
+
+// ---- POST HANDLERS ---- //
+app.post('/terra_hook', async (req, res) => {
   switch (req.body.type) {
     case "auth":
       register_user(req.body.user.user_id)
@@ -31,37 +47,31 @@ app.post('/terra_hook', (req, res) => {
     default:
       break
   }
-  res.end(JSON.stringify(req.body.type, null, 2))
+  res.sendStatus(200)
+  await db.write()
 })
 
-// POST Handler that receives user actions
-app.post('/send_action/:user_id', (req, res) => {
+app.post('/send_action/:user_id', async (req, res) => {
   switch (req.body.type) {
     case "recycle":
       // reward user for recycling
       inc_recycle(req.params.user_id)
-      res.send(200)
+      res.sendStatus(200)
       break
     case "summary":
       report_daily_summary(req.params.user_id, req.body)
-      res.send(200)
+      res.sendStatus(200)
     default:
+      res.sendStatus(404)
       break
   }
+  await db.write()
 })
 
-// GET Handler that returns the user their bar values
-app.get('/get_values/:user_id', (req, res) => {
-  res.json(db[req.params.user_id])
-})
-
-app.listen(port, () => {
-  console.log(`🚀 terragatchi server running on ${color.green(port)}!`)
-})
-
-register_user = (uid) => {
-  if (!uid in db) {
-    db[uid] = {
+// ---- HELPER / HANDLERS ---- //
+let register_user = (uid) => {
+  if (!(uid in db.data)) {
+    db.data[uid] = {
       "health": 0,
       "environment": 0
     }
@@ -71,43 +81,46 @@ register_user = (uid) => {
   }
 }
 
-update_user = (old_uid, new_uid) => {
-  db[new_uid] = db[old_uid];
-  delete db[old_uid];
-
-  console.log(`🔧 User re-registered from ${color.red(old_uid)} to ${color.magenta(new_uid)}!`)
+let update_user = (old_uid, new_uid) => {
+  if (old_uid in db.data && !(new_uid in db.data)) {
+    db.data[new_uid] = db.data[old_uid];
+    delete db.data[old_uid];
+    console.log(`🔧 User re-registered from ${color.red(old_uid)} to ${color.magenta(new_uid)}!`)
+  } else {
+    console.log(`🔧 Re-register ${color.red("failed")}!`)
+  }
 }
 
-load_activity_data = (uid, data) => {
+let load_activity_data = (uid, data) => {
   let moderate_minutes = data.num_moderate_intensity_minutes
   let high_minutes = data.num_high_intensity_minutes
-
+  
   let score = Math.floor(moderate_minutes / 10 + high_minutes / 3)
-
-  db[uid].health += score
+  
+  db.data[uid].health += score
   console.log(`🏋️ ${color.magenta(old_uid)} completed an activity, updating scores!`)
 }
 
-inc_recycle = (uid) => {
-  db[uid].environment += 2
-  console.log(db)
+let inc_recycle = (uid) => {
+  db.data[uid].environment += 2
+  console.log(db.data)
 }
 
-report_daily_summary = (uid, data) => {
-  let dbe = db[uid]
+let report_daily_summary = (uid, data) => {
+  let dbe = db.data[uid]
   let score = 0
   score += calculate_transport_score(data.transport)
-
+  
   if (data.recycled == true) {
     score += 10
   }
-
+  
   score += data.meals.map(calculate_meal_score).reduce((sum, a) => sum + a, 0)
   dbe.environment += score
-  console.log(db)
+  console.log(db.data)
 }
 
-calculate_transport_score = (transport) => {
+let calculate_transport_score = (transport) => {
   let score = 0
   if (transport.includes("walk")) {
     score += 10
@@ -121,7 +134,7 @@ calculate_transport_score = (transport) => {
   return score
 }
 
-calculate_meal_score = (meal) => {
+let calculate_meal_score = (meal) => {
   switch (meal) {
     case "self":
       return 10
@@ -133,6 +146,7 @@ calculate_meal_score = (meal) => {
   }
 }
 
+// ---- LOGGING HELPERS ---- //
 const color = {
   reset: "\x1b[0m",
   black: (msg) => `\x1b[30m${msg}${color.reset}`,
@@ -145,3 +159,8 @@ const color = {
   white: (msg) => `\x1b[37m${msg}${color.reset}`,
   gray: (msg) => `\x1b[90m${msg}${color.reset}`,
 }
+
+// ---- SERVER LISTEN ---- //
+app.listen(port, () => {
+  console.log(`🚀 terragatchi server running on ${color.green(port)}!`)
+})
