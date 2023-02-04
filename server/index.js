@@ -23,11 +23,26 @@ app.post('/terra_hook', (req, res) => {
       break;
     case "activity":
       load_activity_data(req.body.user.user_id, req.body.MET_data);
-      break;
     default:
       break;
   }
   res.end(JSON.stringify(req.body.type, null, 2))
+})
+
+// POST Handler that receives user actions
+app.post('/send_action/:user_id', (req, res) => {
+  switch (req.body.type) {
+    case "recycle":
+      // reward user for recycling
+      break;
+    default:
+      break;
+  }
+})
+
+// GET Handler that returns the user their bar values
+app.get('/get_values/:user_id', (req, res) => {
+  res.json(db[req.params.user_id])
 })
 
 app.listen(port, () => {
