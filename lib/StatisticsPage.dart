@@ -31,7 +31,7 @@ class StatisticsPage extends State<StatisticsWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Environment score: ${EnvironmentPage.totalScore.round()}',
+              'Environment score: ${EnvironmentPage.envScore.round()}',
               style: const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
             ),
             Slider(
@@ -75,18 +75,17 @@ class StatisticsPage extends State<StatisticsWidget> {
             ).then((value) => setState(() {}));
           }
         },
-
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.camera),
+            icon: Icon(Icons.add_task_rounded),
             label: 'environment',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.camera),
+            icon: Icon(Icons.bar_chart_rounded),
             label: 'statistics',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
+            icon: Icon(Icons.account_circle_outlined),
             label: 'account',
           ),
         ],

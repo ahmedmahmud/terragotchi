@@ -149,18 +149,17 @@ class AccountPage extends State<AccountWidget> {
             ).then((value) => setState(() {}));
           }
         },
-
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.camera),
+            icon: Icon(Icons.add_task_rounded),
             label: 'environment',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.camera),
+            icon: Icon(Icons.bar_chart_rounded),
             label: 'statistics',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
+            icon: Icon(Icons.account_circle_outlined),
             label: 'account',
           ),
         ],
