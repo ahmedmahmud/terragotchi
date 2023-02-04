@@ -168,6 +168,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
+  terra_flutter_bridge:
+    dependency: "direct main"
+    description:
+      name: terra_flutter_bridge
+      sha256: "9bb4e2e1ffc6ffa155ec7203fd310944dcdbd8ca0a9fd284b6ae6ffa1a191e5d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.5"
   test_api:
     dependency: transitive
     description:
@@ -185,4 +193,5 @@ packages:
     source: hosted
     version: "2.1.4"
 sdks:
-  dart: ">=2.19.0 <4.0.0"
+  dart: ">=2.19.0 <3.0.0"
+  flutter: ">=2.5.0"
