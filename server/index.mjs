@@ -1,6 +1,7 @@
 // ---- IMPORTS ---- //
 import express from 'express'
 import bodyParser from 'body-parser'
+import moment from 'moment'
 import { Low } from 'lowdb'
 import { JSONFile } from 'lowdb/node'
 
@@ -43,15 +44,18 @@ app.post('/terra_hook', async (req, res) => {
       update_user(req.body.old_user.user_id, req.body.new_user.user_id)
       break
     case "activity":
+      decay_scores(req.body.user.user_id)
       load_activity_data(req.body.user.user_id, req.body.MET_data)
     default:
       break
   }
+  check_scores(req.body.user.user_id)
   res.sendStatus(200)
   await db.write()
 })
 
 app.post('/send_action/:user_id', async (req, res) => {
+  decay_scores(req.params.user_id)
   switch (req.body.type) {
     case "recycle":
       // reward user for recycling
@@ -65,15 +69,36 @@ app.post('/send_action/:user_id', async (req, res) => {
       res.sendStatus(404)
       break
   }
+  check_scores(req.params.user_id)
   await db.write()
 })
 
 // ---- HELPER / HANDLERS ---- //
+let decay_scores = (uid) => {
+  let user = db.data[uid]
+  let time = moment().unix()
+  let delta = Math.max(time - db.data[uid].timestamp, 0)
+  user.health = Math.max(user.health - delta * 0.0001, 0)
+  user.planet = Math.max(user.planet - delta * 0.0001, 0)
+
+}
+
+let check_scores = (uid) => {
+  let user = db.data[uid]
+  user.health = Math.min(user.health, 100)
+  user.health = Math.max(user.health, 0)
+  user.planet = Math.min(user.planet, 100)
+  user.planet = Math.max(user.planet, 0)
+}
+
 let register_user = (uid) => {
   if (!(uid in db.data)) {
+    let time = moment().unix()
+    console.log(time)
     db.data[uid] = {
       "health": 0,
-      "environment": 0
+      "planet": 0,
+      "timestamp": time
     }
     console.log(`🔧 Successfully registered ${color.magenta(uid)} to the database!`)
   } else {
@@ -94,15 +119,15 @@ let update_user = (old_uid, new_uid) => {
 let load_activity_data = (uid, data) => {
   let moderate_minutes = data.num_moderate_intensity_minutes
   let high_minutes = data.num_high_intensity_minutes
-  
+
   let score = Math.floor(moderate_minutes / 10 + high_minutes / 3)
-  
+
   db.data[uid].health += score
   console.log(`🏋️ ${color.magenta(old_uid)} completed an activity, updating scores!`)
 }
 
 let inc_recycle = (uid) => {
-  db.data[uid].environment += 2
+  db.data[uid].planet += 2
   console.log(db.data)
 }
 
@@ -110,13 +135,13 @@ let report_daily_summary = (uid, data) => {
   let dbe = db.data[uid]
   let score = 0
   score += calculate_transport_score(data.transport)
-  
+
   if (data.recycled == true) {
     score += 10
   }
-  
+
   score += data.meals.map(calculate_meal_score).reduce((sum, a) => sum + a, 0)
-  dbe.environment += score
+  dbe.planet += score
   console.log(db.data)
 }
 

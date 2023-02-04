@@ -1,4 +1,9 @@
 {
+  "1": {
+    "health": 0,
+    "planet": 5.99967,
+    "timestamp": 1675545388
+  },
   "abc123": {
     "health": 0,
     "environment": 0
