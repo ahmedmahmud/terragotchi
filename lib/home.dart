@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'secondPage.dart';
+
+Color? primaryColor = Colors.deepPurpleAccent[100];
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -9,11 +10,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Terragotchi App',
+      title: 'TerraGotchi App',
       theme: ThemeData(
-        primarySwatch: Colors.lightGreen,
+        primaryColor: primaryColor,
       ),
-      home: const MyHomePage(title: 'Terragotchi 👾'),
+      home: const MyHomePage(title: 'TerraGotchi'),
     );
   }
 }
@@ -28,35 +29,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _totalScore = 0;
-  int _healthScore = 0;
-  int _envScore = 0;
-
-  void _incrementHealth(int val) {
-    setState(() {
-      _healthScore += val;
-      _updateTotalScore();
-    });
-  }
-
-  void _incrementEnv(int val) {
-    setState(() {
-      _envScore += val;
-      _updateTotalScore();
-    });
-  }
-
-  void _updateTotalScore() {
-    setState(() {
-      _totalScore = (_healthScore + _envScore) ~/ 2;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
+          backgroundColor: primaryColor,
         ),
         body: Center(
           child: Column(
@@ -66,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Current total score:',
               ),
               Text(
-                '$_totalScore',
+                '${SecondRoutes.totalScore}',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ],
@@ -77,28 +55,14 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                TextButton.icon(
-                    onPressed: () => _incrementHealth(5),
-                    icon: const Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                    ),
-                    label: const Text("Health")),
-                TextButton.icon(
-                    onPressed: () => _incrementEnv(5),
-                    icon: const Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                    ),
-                    label: const Text("Environment")),
                 ElevatedButton(
                   child: const Text('To next page'),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SecondRoute()),
-                    );
+                          builder: (context) => const MySecondPage()),
+                    ).then((value) => setState(() {}));
                   },
                 ),
               ],

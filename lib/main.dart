@@ -56,19 +56,3 @@ class _MySplashPageState extends State<SplashPage> {
     );
   }
 }
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Terragotchi App',
-      theme: ThemeData(
-        primarySwatch: Colors.lightGreen,
-      ),
-      home: const MyHomePage(title: 'Terragotchi 👾'),
-    );
-  }
-}
