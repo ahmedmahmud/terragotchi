@@ -19,7 +19,7 @@ app.post('/terra_hook', (req, res) => {
       register_user(req.body.user.user_id);
       break;
     case "user_reauth":
-      update_user();
+      update_user(req.body.old_user.user_id, req.body.new_user.user_id);
       break;
     case "activity":
       load_activity_data(req.body.user.user_id, req.body.MET_data);
@@ -60,6 +60,7 @@ register_user = (uid) => {
 update_user = (old_uid, new_uid) => {
   db[new_uid] = db[old_uid];
   delete db[old_uid];
+  console.log(db)
 }
 
 load_activity_data = (uid, data) => {
@@ -69,4 +70,5 @@ load_activity_data = (uid, data) => {
   let score = Math.floor(moderate_minutes / 10 + high_minutes / 3)
 
   db[uid].health += score;
+  console.log(db)
 }
