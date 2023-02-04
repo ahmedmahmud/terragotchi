@@ -2,6 +2,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import moment from 'moment'
+import hash from 'object-hash'
 import { Low } from 'lowdb'
 import { JSONFile } from 'lowdb/node'
 
@@ -17,6 +18,7 @@ const db = new Low(adapter)
 
 await db.read()
 db.data ||= {}
+db.data.current_id ||= 1
 
 // ---- SERVER SETUP ---- //
 const app = express()
@@ -28,6 +30,32 @@ app.use(bodyParser.json())
 // ---- GET HANDLERS ---- //
 app.get('/', (req, res) => {
   res.send('🌍 Terragotchi 🌍')
+})
+
+app.get('/generate_url', async (req, res) => {
+  const ref_id = hash(db.data.current_id++)
+  await db.write()
+  
+  fetch('https://api.tryterra.co/v2/auth/generateWidgetSession', {
+    method: 'POST',
+    headers: {
+      "accept": "application/json",
+      "dev-id": "enviro-health-tamgotchi-dev-aNdyzr1TgM",
+      "content-type": "application/json",
+      'x-api-key': '23be8ca410a6d8d2973c47c42f844f9231fd73c6b64496a1b267c96e016ffd20',
+    },
+    body: JSON.stringify({
+      reference_id: ref_id,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('🌍 Generated wigdet URL:', data, ref_id);
+      res.json({ ref_id, url: data.url })
+    })
+    .catch((error) => {
+      console.error(`${color.red(Error)}:`, error);
+    });
 })
 
 app.get('/get_values/:reference_id', (req, res) => {

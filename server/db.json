@@ -7,5 +7,6 @@
   "abc123": {
     "health": 0,
     "environment": 0
-  }
+  },
+  "current_id": 11
 }
