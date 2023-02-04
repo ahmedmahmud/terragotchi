@@ -195,7 +195,7 @@ let update_meal = (uid, method, category) => {
     case "fish":
       user.planet -= 2
       break
-    case "fish":
+    case "white meat":
       break
     case "vegetarian":
       user.planet += 5
