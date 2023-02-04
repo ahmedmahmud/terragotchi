@@ -85,7 +85,7 @@ load_activity_data = (uid, data) => {
   let score = Math.floor(moderate_minutes / 10 + high_minutes / 3)
 
   db[uid].health += score
-  console.log(db)
+  console.log(`🏋️ ${color.magenta(old_uid)} completed an activity, updating scores!`)
 }
 
 inc_recycle = (uid) => {
