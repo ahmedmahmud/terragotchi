@@ -1,2 +1,2 @@
-# terragotchi
-A tamagochi app that monitors youe health and environmental friendliness
+# terragotchi 👾
+A tamagochi app that monitors your health and environmental friendliness
