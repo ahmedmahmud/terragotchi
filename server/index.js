@@ -1,5 +1,5 @@
 const express = require('express')
-var bodyParser = require('body-parser')
+const bodyParser = require('body-parser')
 
 const app = express()
 const port = 3000
@@ -56,21 +56,26 @@ app.get('/get_values/:user_id', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`🚀 terragatchi server running on ${color.green(port)}!`)
 })
 
 register_user = (uid) => {
-  db[uid] = {
-    "health": 0,
-    "environment": 0
+  if (!uid in db) {
+    db[uid] = {
+      "health": 0,
+      "environment": 0
+    }
+    console.log(`🔧 Successfully registered ${color.magenta(uid)} to the database!`)
+  } else {
+    console.log(`🖇️ ${color.red(uid)} already exists! Ignoring...`)
   }
-  console.log(db)
 }
 
 update_user = (old_uid, new_uid) => {
-  db[new_uid] = db[old_uid]
-  delete db[old_uid]
-  console.log(db)
+  db[new_uid] = db[old_uid];
+  delete db[old_uid];
+
+  console.log(`🔧 User re-registered from ${color.red(old_uid)} to ${color.magenta(new_uid)}!`)
 }
 
 load_activity_data = (uid, data) => {
