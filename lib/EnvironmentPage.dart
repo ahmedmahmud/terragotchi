@@ -169,6 +169,8 @@ class EnvironmentPage extends State<EnvironmentWidget> {
     Color boxColor = AppColors.secondaryColor;
     double dropboxSize = 200.0;
 
+    Color disabledColor = Colors.black54;
+
     return Scaffold(
       // navigate back and the top part of the app
       appBar: AppBar(
@@ -201,7 +203,7 @@ class EnvironmentPage extends State<EnvironmentWidget> {
             Container(
               width: 300.0,
               decoration: BoxDecoration(
-                color: boxColor,
+                color: active[0] ? boxColor : disabledColor,
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
               ),
               child: Column(
@@ -215,12 +217,12 @@ class EnvironmentPage extends State<EnvironmentWidget> {
                     width: dropboxSize,
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: boxColor, 
+                      color: active[0] ? boxColor : disabledColor, 
                     ),
                     child: DropdownButton(
                           isExpanded: true,
                           value: transportValue,
-                          dropdownColor: boxColor,
+                          dropdownColor: active[0] ? boxColor : disabledColor,
                           icon: const Icon(Icons.keyboard_arrow_down),
                           items: transport.map((String items) {
                             return DropdownMenuItem(
@@ -253,7 +255,7 @@ class EnvironmentPage extends State<EnvironmentWidget> {
             Container(
               width: 300.0,
               decoration: BoxDecoration(
-                color: boxColor,
+                color: active[1] ? boxColor : disabledColor,
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
               ),
               child: Column(
@@ -267,12 +269,12 @@ class EnvironmentPage extends State<EnvironmentWidget> {
                     width: dropboxSize,
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: boxColor, 
+                      color: active[1] ? boxColor : disabledColor, 
                     ),
                     child: DropdownButton(
                           isExpanded: true,
                           value: methodValue,
-                          dropdownColor: boxColor,
+                          dropdownColor: active[1] ? boxColor : disabledColor,
                           icon: const Icon(Icons.keyboard_arrow_down),
                           items: method.map((String items) {
                             return DropdownMenuItem(
@@ -298,12 +300,12 @@ class EnvironmentPage extends State<EnvironmentWidget> {
                     width: dropboxSize,
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: boxColor, 
+                      color: active[1] ? boxColor : disabledColor, 
                     ),
                     child: DropdownButton(
                           isExpanded: true,
                           value: dietValue,
-                          dropdownColor: boxColor,
+                          dropdownColor: active[1] ? boxColor : disabledColor,
                           icon: const Icon(Icons.keyboard_arrow_down),
                           items: diet.map((String items) {
                             return DropdownMenuItem(
@@ -336,7 +338,7 @@ class EnvironmentPage extends State<EnvironmentWidget> {
             Container(
               width: 300.0,
               decoration: BoxDecoration(
-                color: active[2] ? boxColor : Colors.black45,
+                color: active[2] ? boxColor : disabledColor,
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
               ),
               child: TextButton(

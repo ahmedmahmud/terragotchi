@@ -46,15 +46,62 @@ class StatisticsWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Environment score: ${data.planetScore.round()}',
+              'Environment score: ${getEnvValue()}',
               style: style,
               textAlign: TextAlign.center,
             ),
-            Slider(
-              value: data.planetScore.toDouble(),
-              max: 100,
-              label: data.planetScore.round().toString(),
-              onChanged: null,
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                disabledThumbColor: AppColors.primaryFontColor,
+                disabledInactiveTrackColor: Colors.grey,
+                disabledActiveTrackColor: AppColors.primaryFontColor,
+              ),
+              child: Slider(
+                value: getEnvValue().toDouble(),
+                max: 100,
+                label: getEnvValue().round().toString(),
+                onChanged: null,
+              ),
+            ),
+            SizedBox(height: 10,),
+
+            Text(
+              'Health score: ${getHealthValue()}',
+              style: style,
+              textAlign: TextAlign.center,
+            ),
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                disabledThumbColor: AppColors.primaryFontColor,
+                disabledInactiveTrackColor: Colors.grey,
+                disabledActiveTrackColor: AppColors.primaryFontColor,
+              ),
+              child: Slider(
+                value: getHealthValue().toDouble(),
+                max: 100,
+                label: getHealthValue().round().toString(),
+                onChanged: null,
+              ),
+            ),
+            SizedBox(height: 10,),
+
+            Text(
+              'Sleep score: ${getSleepValue()}',
+              style: style,
+              textAlign: TextAlign.center,
+            ),
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                disabledThumbColor: AppColors.primaryFontColor,
+                disabledInactiveTrackColor: Colors.grey,
+                disabledActiveTrackColor: AppColors.primaryFontColor,
+              ),
+              child: Slider(
+                value: getSleepValue().toDouble(),
+                max: 100,
+                label: getSleepValue().round().toString(),
+                onChanged: null,
+              ),
             ),
           ],
         ),
