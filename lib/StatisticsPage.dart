@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:terragotchi/sharedPrefs.dart';
@@ -36,7 +38,8 @@ class StatisticsWidget extends StatelessWidget {
 
   Future<void> pressButton() async {
     await (await getData()).clear();
-    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+    // SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+    exit(0);
   }
 
   @override
@@ -145,7 +148,7 @@ class StatisticsWidget extends StatelessWidget {
                 onPressed: () {
                   pressButton();
                 },
-                child: Text('Reset',
+                child: Text('Delete Profile',
                     style: questionStyle, textAlign: TextAlign.center),
               ),
             ),
