@@ -46,13 +46,13 @@ class _MySplashPageState extends State<SplashPage> {
       child: SizedBox(
         width: 60.0,
         child: Column(children: <Widget>[
-          const SizedBox(height: 120),
+          const SizedBox(height: 200),
           Image.asset(
             'assets/images/alien.png',
             fit: BoxFit.cover,
-            // width: 200,
+            width: 200
           ),
-          const SizedBox(height: 120),
+          const SizedBox(height: 50),
           Image.asset(
             'assets/images/terra.png',
             fit: BoxFit.cover,

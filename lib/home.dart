@@ -32,6 +32,10 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+  // 0 to 35 to process the scores
+  // 35 to 60 
+  // 60 to 100 
+  // then render the stack
   // takes in a list of scores, each representing a category [0, 1 or 2]
   Stack getImage(List<int> scores) {
     return Stack(children: [
@@ -104,6 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'Current total score: ${EnvironmentPage.totalScore.round()}',
               style: const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
             ),
+            // loaded (bool) = if the dispay haven't rendered
             loaded
                 ? Text(
                     'Current total score: ${data?.sleepScore.round()}',
@@ -120,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const TextStyle(fontFamily: 'Space Mono', fontSize: 14),
         unselectedLabelStyle:
             const TextStyle(fontFamily: 'Space Mono', fontSize: 14),
-        selectedItemColor: AppColors.secondaryColor,
+        selectedItemColor: AppColors.tertiaryColor,
         unselectedItemColor: AppColors.secondaryColor,
         elevation: 0.0,
         backgroundColor: AppColors.primaryColor,
@@ -166,9 +171,10 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class UserData {
+  // each from 0 to 100
   final int sleepScore;
   final int healthScore;
-  final int planetScore;
+  final int planetScore; // is envScore
 
   const UserData(
       {required this.sleepScore,
