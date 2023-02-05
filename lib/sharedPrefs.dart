@@ -57,7 +57,7 @@ class SetupState extends State<Setup> {
 }
 
 void doSetup(BuildContext context) async {
-  // await(await getData()).clear();
+  await (await getData()).clear();
   if ((await getData()).getString('ref_id') == null) {
     final res = await http.get(Uri.parse(
         'https://5958-2a0c-5bc0-40-2e34-fbce-a082-7d2-f71b.eu.ngrok.io/generate_url'));

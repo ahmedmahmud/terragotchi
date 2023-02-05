@@ -1,7 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:terragotchi/sharedPrefs.dart';
 import 'colors.dart';
 import 'home.dart';
+import 'package:http/http.dart' as http;
 
 class LeaderboardModel {
   final String name;
@@ -14,7 +18,8 @@ class LeaderboardModel {
 
   factory LeaderboardModel.fromJson(Map json, bool isUser) {
     return LeaderboardModel(
-        name: isUser ? "You" : json['reference_id'], score: json['score']);
+        name: isUser ? "You" : json['id'].substring(0, 5),
+        score: json['score']);
   }
 }
 
@@ -26,12 +31,32 @@ class LeaderboardWidget extends StatefulWidget {
 }
 
 class LeaderboardPage extends State<LeaderboardWidget> {
-  final _leaderboardScores = [
-    LeaderboardModel(name: "Jon", score: 1),
-    LeaderboardModel(name: "ALice", score: 15),
-    LeaderboardModel(name: "Bob", score: 85),
-    LeaderboardModel(name: "Jeremia", score: 69),
-  ];
+  Timer? timer;
+  @override
+  void initState() {
+    print("in ldb");
+    super.initState();
+    updateLeaderboard();
+    timer = Timer.periodic(
+        const Duration(seconds: 10), (Timer t) => updateLeaderboard());
+  }
+
+  var _leaderboardScores = [];
+
+  void updateLeaderboard() async {
+    String? refId = (await getData()).getString('ref_id');
+    final res = await http.get(Uri.parse(
+        'https://5958-2a0c-5bc0-40-2e34-fbce-a082-7d2-f71b.eu.ngrok.io/leaderboard'));
+    List ldb = jsonDecode(res.body);
+    List entries = [];
+    for (var entry in ldb) {
+      var isUser = (entry["id"] == refId);
+      entries.add(LeaderboardModel.fromJson(entry, isUser));
+    }
+    setState(() {
+      _leaderboardScores = entries;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
