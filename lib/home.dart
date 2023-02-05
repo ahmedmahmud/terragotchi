@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'terragotchi',
       theme: ThemeData(
         primaryColor: AppColors.primaryColor,
@@ -46,8 +47,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int sleepIndex = 2;
 
   // 0 to 35 to process the scores
-  // 35 to 60 
-  // 60 to 100 
+  // 35 to 60
+  // 60 to 100
   // then render the stack
   // takes in a list of scores, each representing a category [0, 1 or 2]
   // [<score-env>, <score-health>, <score-sleep>]
@@ -63,21 +64,28 @@ class _MyHomePageState extends State<MyHomePage> {
       return 2;
     }
   }
-  
+
   UserData resolveUserData(UserData? data) {
-    return data ?? const UserData(healthScore: 0, planetScore: 0, sleepScore: 0);
+    return data ??
+        const UserData(healthScore: 0, planetScore: 0, sleepScore: 0);
   }
 
   // gets overlayed image of current state
   Stack getImage(List<int?> scores) {
     return Stack(children: [
       Image.asset('assets/images/earth/stars.png'),
-      Image.asset('assets/images/earth/${calulateScoreInt(scores[envIndex])}-Base.png'),
-      Image.asset('assets/images/earth/${calulateScoreInt(scores[envIndex])}-Green.png'),
-      Image.asset('assets/images/earth/${calulateScoreInt(scores[healthIndex])}-Calorie.png'),
-      Image.asset('assets/images/earth/${calulateScoreInt(scores[envIndex])}-Air.png'),
-      Image.asset('assets/images/earth/${calulateScoreInt(scores[sleepIndex])}-Tired.png'),
-      Image.asset('assets/images/earth/${calulateScoreInt(scores[healthIndex])}-Feel.png'),
+      Image.asset(
+          'assets/images/earth/${calulateScoreInt(scores[envIndex])}-Base.png'),
+      Image.asset(
+          'assets/images/earth/${calulateScoreInt(scores[envIndex])}-Green.png'),
+      Image.asset(
+          'assets/images/earth/${calulateScoreInt(scores[healthIndex])}-Calorie.png'),
+      Image.asset(
+          'assets/images/earth/${calulateScoreInt(scores[envIndex])}-Air.png'),
+      Image.asset(
+          'assets/images/earth/${calulateScoreInt(scores[sleepIndex])}-Tired.png'),
+      Image.asset(
+          'assets/images/earth/${calulateScoreInt(scores[healthIndex])}-Feel.png'),
       Image.asset('assets/images/earth/Frontshine.png'),
     ]);
   }
@@ -123,33 +131,32 @@ class _MyHomePageState extends State<MyHomePage> {
         bottomOpacity: 0.0,
         elevation: 0.0,
       ),
-      body: 
-        Container(
-          decoration: BoxDecoration(
-            // Box decoration takes a gradient
-            gradient: RadialGradient(
-              // Where the linear gradient begins and ends
-              // Add one stop for each color. Stops should increase from 0 to 1
-              radius: 0.8,
-              colors: [
-                // Colors are easy thanks to Flutter's Colors class.
-                AppColors.secondaryColor,
-                Colors.black,
-                AppColors.primaryColor,
-              ],
-            ),
-          ),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                loaded
-                    ? getImage([data?.planetScore, data?.healthScore, data?.sleepScore])
-                    : const Text(''),
-              ],
+      body: Container(
+        decoration: BoxDecoration(
+          // Box decoration takes a gradient
+          gradient: RadialGradient(
+            // Where the linear gradient begins and ends
+            // Add one stop for each color. Stops should increase from 0 to 1
+            radius: 0.8,
+            colors: [
+              // Colors are easy thanks to Flutter's Colors class.
+              AppColors.secondaryColor,
+              Colors.black,
+              AppColors.primaryColor,
+            ],
           ),
         ),
-      
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            loaded
+                ? getImage(
+                    [data?.planetScore, data?.healthScore, data?.sleepScore])
+                : const Text(''),
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         // style
         selectedLabelStyle:
@@ -172,7 +179,10 @@ class _MyHomePageState extends State<MyHomePage> {
           if (value == 1) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => StatisticsWidget(data:resolveUserData(data),)),
+              MaterialPageRoute(
+                  builder: (context) => StatisticsWidget(
+                        data: resolveUserData(data),
+                      )),
             ).then((value) => setState(() {}));
           }
           if (value == 2) {
