@@ -1,11 +1,14 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:terragotchi/sharedPrefs.dart';
 import 'AccountPage.dart';
 import 'EnvironmentPage.dart';
 import 'StatisticsPage.dart';
-
-Color? primaryColor = Colors.deepPurpleAccent[100];
+import 'colors.dart';
+import 'package:http/http.dart' as http;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -14,10 +17,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TerraGotchi App',
+      title: 'terragotchi',
       theme: ThemeData(
-        primaryColor: primaryColor,
-        scaffoldBackgroundColor: primaryColor,
+        primaryColor: AppColors.primaryColor,
+        scaffoldBackgroundColor: AppColors.primaryColor,
       ),
       home: const MyHomePage(title: 'terragotchi'),
     );
@@ -29,11 +32,17 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
-  // returns a list of scores, each representing a category
+  // takes in a list of scores, each representing a category [0, 1 or 2]
   Stack getImage(List<int> scores) {
     return Stack(children: [
-      Image.asset('assets/images/earth${scores[0]}.png'),
-      Image.asset('assets/images/mood${scores[1]}.png'),
+      Image.asset('assets/images/earth/${scores[0]}-Base.png'),
+      Image.asset(
+          'assets/images/earth/${EnvironmentPage.envScore / ~33}-Green.png'),
+      Image.asset('assets/images/earth/${scores[0]}-Calorie.png'),
+      Image.asset('assets/images/earth/${scores[0]}-Air.png'),
+      Image.asset('assets/images/earth/${scores[0]}-Tired.png'),
+      Image.asset('assets/images/earth/${scores[0]}-Feel.png'),
+      Image.asset('assets/images/earth/Frontshine.png'),
     ]);
   }
 
@@ -42,6 +51,36 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool loaded = false;
+  UserData? data;
+  Timer? timer;
+
+  void updateScoreState() async {
+    print("in upd");
+    String? refId = (await getData()).getString('ref_id');
+    final res = await http.get(Uri.parse(
+        'https://5958-2a0c-5bc0-40-2e34-fbce-a082-7d2-f71b.eu.ngrok.io/get_values/${refId!}'));
+    setState(() {
+      data = UserData.fromJson(jsonDecode(res.body));
+      loaded = true;
+    });
+  }
+
+  @override
+  void initState() {
+    print("in init");
+    super.initState();
+    updateScoreState();
+    timer = Timer.periodic(
+        const Duration(seconds: 10), (Timer t) => updateScoreState());
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
             style: const TextStyle(fontFamily: 'Space Mono', fontSize: 28),
           ),
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primaryColor,
         bottomOpacity: 0.0,
         elevation: 0.0,
       ),
@@ -63,8 +102,15 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Text(
               'Current total score: ${EnvironmentPage.totalScore.round()}',
-              style: TextStyle(fontFamily: 'Space Mono', fontSize: 18),
+              style: const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
             ),
+            loaded
+                ? Text(
+                    'Current total score: ${data?.sleepScore.round()}',
+                    style:
+                        const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
+                  )
+                : const Text(''),
           ],
         ),
       ),
@@ -74,10 +120,10 @@ class _MyHomePageState extends State<MyHomePage> {
             const TextStyle(fontFamily: 'Space Mono', fontSize: 14),
         unselectedLabelStyle:
             const TextStyle(fontFamily: 'Space Mono', fontSize: 14),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white,
+        selectedItemColor: AppColors.secondaryColor,
+        unselectedItemColor: AppColors.secondaryColor,
         elevation: 0.0,
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primaryColor,
         // function
         onTap: (value) {
           if (value == 0) {
@@ -116,5 +162,23 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
+  }
+}
+
+class UserData {
+  final int sleepScore;
+  final int healthScore;
+  final int planetScore;
+
+  const UserData(
+      {required this.sleepScore,
+      required this.healthScore,
+      required this.planetScore});
+
+  factory UserData.fromJson(Map<String, dynamic> json) {
+    return UserData(
+        sleepScore: json['sleep'],
+        healthScore: json['health'],
+        planetScore: json['planet']);
   }
 }

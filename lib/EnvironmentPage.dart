@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:async/async.dart';
+import 'colors.dart';
 import 'home.dart';
-import 'AccountPage.dart';
-import 'StatisticsPage.dart';
 
 class EnvironmentWidget extends StatefulWidget {
   const EnvironmentWidget({super.key});
@@ -70,6 +69,29 @@ class EnvironmentPage extends State<EnvironmentWidget> {
     });
   }
 
+  String transportValue = 'walk';
+  String methodValue = 'self';
+  String dietValue = 'red meat';
+
+  var transport = [
+    'walk',
+    'cycle',
+    'bus',
+    'car',
+  ];
+  var method = [
+    'self',
+    'bought',
+    'delivery',
+    'car',
+  ];
+  var diet = [
+    'red meat',
+    'fish',
+    'white meat',
+    'vegetarian',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final ButtonStyle style = ElevatedButton.styleFrom(
@@ -79,6 +101,13 @@ class EnvironmentPage extends State<EnvironmentWidget> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          padding: const EdgeInsets.only(left: 20.0, top: 25.0),
+          icon: const Icon(Icons.arrow_back_ios),
+        ),
         title: const Padding(
           padding: EdgeInsets.only(top: 20.0),
           child: Text(
@@ -86,80 +115,106 @@ class EnvironmentPage extends State<EnvironmentWidget> {
             style: TextStyle(fontFamily: 'Space Mono', fontSize: 28),
           ),
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primaryColor,
         bottomOpacity: 0.0,
         elevation: 0.0,
       ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ElevatedButton(
-              style: style,
-              onPressed: active[0] ? () => pressButton(0, 5, true) : null,
-              child: const Text('carbon-free travel'),
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                DropdownButton(
+                  value: transportValue,
+                  icon: const Icon(Icons.keyboard_arrow_down),
+                  items: transport.map((String items) {
+                    return DropdownMenuItem(
+                      value: items,
+                      child: Text(items,
+                          style: const TextStyle(
+                            fontFamily: 'Space Mono',
+                            fontSize: 28,
+                          )),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      transportValue = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 30),
+                DropdownButton(
+                  value: methodValue,
+                  icon: const Icon(Icons.keyboard_arrow_down),
+                  items: method.map((String items) {
+                    return DropdownMenuItem(
+                      value: items,
+                      child: Text(
+                        items,
+                        style: const TextStyle(
+                            fontFamily: 'Space Mono', fontSize: 28),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      methodValue = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 30),
+                DropdownButton(
+                  value: dietValue,
+                  icon: const Icon(Icons.keyboard_arrow_down),
+                  items: diet.map((String items) {
+                    return DropdownMenuItem(
+                      value: items,
+                      child: Text(
+                        items,
+                        style: const TextStyle(
+                            fontFamily: 'Space Mono', fontSize: 28),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      dietValue = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 30),
+              ]),
             ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              style: style,
-              onPressed: active[1] ? () => pressButton(1, 5, true) : null,
-              child: const Text('donated used items'),
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+              child: ElevatedButton(
+                style: style,
+                onPressed: active[1] ? () => pressButton(1, 5, true) : null,
+                child: const Text('donated used items'),
+              ),
             ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              style: style,
-              onPressed: active[2] ? () => pressButton(2, 5, true) : null,
-              child: const Text('recycled rubbish'),
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+              child: ElevatedButton(
+                style: style,
+                onPressed: active[2] ? () => pressButton(2, 5, true) : null,
+                child: const Text('recycled rubbish'),
+              ),
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        // style
-        selectedLabelStyle:
-            const TextStyle(fontFamily: 'Space Mono', fontSize: 14),
-        unselectedLabelStyle:
-            const TextStyle(fontFamily: 'Space Mono', fontSize: 14),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white,
-        elevation: 0.0,
-        backgroundColor: primaryColor,
-        // function
-        onTap: (value) {
-          if (value == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const EnvironmentWidget()),
-            ).then((value) => setState(() {}));
-          }
-          if (value == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const StatisticsWidget()),
-            ).then((value) => setState(() {}));
-          }
-          if (value == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AccountWidget()),
-            ).then((value) => setState(() {}));
-          }
-        },
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_task_rounded),
-            label: 'environment',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart_rounded),
-            label: 'statistics',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle_outlined),
-            label: 'account',
-          ),
-        ],
       ),
     );
   }

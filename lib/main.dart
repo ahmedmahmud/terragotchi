@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'home.dart';
+import 'package:terragotchi/sharedPrefs.dart';
+import 'colors.dart';
 
 void main() {
   runApp(const Splash());
@@ -32,16 +33,17 @@ class _MySplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     Timer(
-        const Duration(seconds: 2),
-        () => Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const MyApp())));
+      const Duration(seconds: 2),
+      () => Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const Setup())),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: primaryColor,
-      child: Container(
+      color: AppColors.primaryColor,
+      child: SizedBox(
         width: 60.0,
         child: Column(children: <Widget>[
           const SizedBox(height: 120),
