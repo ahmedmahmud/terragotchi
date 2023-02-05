@@ -71,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // gets overlayed image of current state
   Stack getImage(List<int?> scores) {
     return Stack(children: [
+      Image.asset('assets/images/earth/stars.png'),
       Image.asset('assets/images/earth/${calulateScoreInt(scores[envIndex])}-Base.png'),
       Image.asset('assets/images/earth/${calulateScoreInt(scores[envIndex])}-Green.png'),
       Image.asset('assets/images/earth/${calulateScoreInt(scores[healthIndex])}-Calorie.png'),
@@ -122,27 +123,33 @@ class _MyHomePageState extends State<MyHomePage> {
         bottomOpacity: 0.0,
         elevation: 0.0,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            // Text(
-            //   'Current total score: ${EnvironmentPage.totalScore.round()}',
-            //   style: const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
-            // ),
-            // loaded (bool) = if the dispay haven't rendered
-            loaded
-                ? getImage([data?.planetScore, data?.healthScore, data?.sleepScore])
-                
-                // Text(
-                //     'Current total score: ${data?.sleepScore.round()}',
-                //     style:
-                //         const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
-                //   )
-                : const Text(''),
-          ],
+      body: 
+        Container(
+          decoration: BoxDecoration(
+            // Box decoration takes a gradient
+            gradient: RadialGradient(
+              // Where the linear gradient begins and ends
+              // Add one stop for each color. Stops should increase from 0 to 1
+              radius: 0.8,
+              colors: [
+                // Colors are easy thanks to Flutter's Colors class.
+                AppColors.secondaryColor,
+                Colors.black,
+                AppColors.primaryColor,
+              ],
+            ),
+          ),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                loaded
+                    ? getImage([data?.planetScore, data?.healthScore, data?.sleepScore])
+                    : const Text(''),
+              ],
+          ),
         ),
-      ),
+      
       bottomNavigationBar: BottomNavigationBar(
         // style
         selectedLabelStyle:
