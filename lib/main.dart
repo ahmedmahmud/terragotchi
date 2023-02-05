@@ -45,20 +45,15 @@ class _MySplashPageState extends State<SplashPage> {
       color: AppColors.primaryColor,
       child: SizedBox(
         width: 60.0,
-        child: Column(children: <Widget>[
-          const SizedBox(height: 200),
-          Image.asset(
-            'assets/images/alien.png',
-            fit: BoxFit.cover,
-            width: 200
-          ),
-          const SizedBox(height: 50),
-          Image.asset(
-            'assets/images/terra.png',
-            fit: BoxFit.cover,
-            width: 200,
-          ),
-        ]),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 200),
+              Image.asset(
+                'assets/images/terra.png',
+                fit: BoxFit.cover,
+              ),
+            ]),
       ),
     );
   }
