@@ -233,7 +233,7 @@ let process_sleep_data = (uid, data) => {
 }
 
 let inc_recycle = (uid) => {
-  db.data[uid].planet += 2
+  db.data[uid].planet += 7
   console.log(db.data)
 }
 
