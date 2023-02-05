@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:terragotchi/sharedPrefs.dart';
 import 'AccountPage.dart';
@@ -32,24 +31,6 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
-  // 0 to 35 to process the scores
-  // 35 to 60 
-  // 60 to 100 
-  // then render the stack
-  // takes in a list of scores, each representing a category [0, 1 or 2]
-  Stack getImage(List<int> scores) {
-    return Stack(children: [
-      Image.asset('assets/images/earth/${scores[0]}-Base.png'),
-      Image.asset(
-          'assets/images/earth/${EnvironmentPage.envScore / ~33}-Green.png'),
-      Image.asset('assets/images/earth/${scores[0]}-Calorie.png'),
-      Image.asset('assets/images/earth/${scores[0]}-Air.png'),
-      Image.asset('assets/images/earth/${scores[0]}-Tired.png'),
-      Image.asset('assets/images/earth/${scores[0]}-Feel.png'),
-      Image.asset('assets/images/earth/Frontshine.png'),
-    ]);
-  }
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -58,6 +39,47 @@ class _MyHomePageState extends State<MyHomePage> {
   bool loaded = false;
   UserData? data;
   Timer? timer;
+
+  // for scores
+  int envIndex = 0;
+  int healthIndex = 1;
+  int sleepIndex = 2;
+
+  // 0 to 35 to process the scores
+  // 35 to 60 
+  // 60 to 100 
+  // then render the stack
+  // takes in a list of scores, each representing a category [0, 1 or 2]
+  // [<score-env>, <score-health>, <score-sleep>]
+
+  // calculates the picture numbers from score
+  int calulateScoreInt(int? score) {
+    int safe = score ?? 0;
+    if (safe < 35) {
+      return 0;
+    } else if (safe < 60) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+  
+  UserData resolveUserData(UserData? data) {
+    return data ?? const UserData(healthScore: 0, planetScore: 0, sleepScore: 0);
+  }
+
+  // gets overlayed image of current state
+  Stack getImage(List<int?> scores) {
+    return Stack(children: [
+      Image.asset('assets/images/earth/${calulateScoreInt(scores[envIndex])}-Base.png'),
+      Image.asset('assets/images/earth/${calulateScoreInt(scores[envIndex])}-Green.png'),
+      Image.asset('assets/images/earth/${calulateScoreInt(scores[healthIndex])}-Calorie.png'),
+      Image.asset('assets/images/earth/${calulateScoreInt(scores[envIndex])}-Air.png'),
+      Image.asset('assets/images/earth/${calulateScoreInt(scores[sleepIndex])}-Tired.png'),
+      Image.asset('assets/images/earth/${calulateScoreInt(scores[healthIndex])}-Feel.png'),
+      Image.asset('assets/images/earth/Frontshine.png'),
+    ]);
+  }
 
   void updateScoreState() async {
     print("in upd");
@@ -104,17 +126,19 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Current total score: ${EnvironmentPage.totalScore.round()}',
-              style: const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
-            ),
+            // Text(
+            //   'Current total score: ${EnvironmentPage.totalScore.round()}',
+            //   style: const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
+            // ),
             // loaded (bool) = if the dispay haven't rendered
             loaded
-                ? Text(
-                    'Current total score: ${data?.sleepScore.round()}',
-                    style:
-                        const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
-                  )
+                ? getImage([data?.planetScore, data?.healthScore, data?.sleepScore])
+                
+                // Text(
+                //     'Current total score: ${data?.sleepScore.round()}',
+                //     style:
+                //         const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
+                //   )
                 : const Text(''),
           ],
         ),
@@ -141,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
           if (value == 1) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const StatisticsWidget()),
+              MaterialPageRoute(builder: (context) => StatisticsWidget(data:resolveUserData(data),)),
             ).then((value) => setState(() {}));
           }
           if (value == 2) {

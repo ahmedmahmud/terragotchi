@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'package:terragotchi/sharedPrefs.dart';
 import 'package:flutter/material.dart';
 import 'package:async/async.dart';
+import 'package:http/http.dart' as http;
 import 'colors.dart';
 // import 'home.dart';
 
@@ -67,17 +70,49 @@ class EnvironmentPage extends State<EnvironmentWidget> {
 
   // By press of the button update the score
   // i   = which (the order) the activity is
-  // val = by how much increase score
-  // env = is it enviroment score
-  void pressButton(int i, int val, bool env) {
+  // val = cooldown
+  void pressButton(int i, int val) async {
+    String refid = (await getData()).getString('ref_id') ?? "";
+    if (i == 0) {
+      http.post(
+        Uri.parse('https://5958-2a0c-5bc0-40-2e34-fbce-a082-7d2-f71b.eu.ngrok.io/send_action/$refid'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'type':'journey',
+          'mode':transportValue,
+        }),
+      );
+    }
+
+    if (i == 1) {
+      http.post(
+        Uri.parse('https://5958-2a0c-5bc0-40-2e34-fbce-a082-7d2-f71b.eu.ngrok.io/send_action/$refid'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'type':'meal',
+          'method':methodValue,
+          'category':dietValue,
+        }),
+      );
+    }
+
+    if (i == 2) {
+      http.post(
+        Uri.parse('https://5958-2a0c-5bc0-40-2e34-fbce-a082-7d2-f71b.eu.ngrok.io/send_action/$refid'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'type':'recycle',
+        }),
+      );
+    }
+
     setState(() {
-      if (env) {
-        envScore += val;
-        _updateTotalScore();
-      } else {
-        healthScore += val;
-        _updateTotalScore();
-      }
       active[i] = false;
     });
   }
@@ -202,6 +237,13 @@ class EnvironmentPage extends State<EnvironmentWidget> {
                           },
                         ),
                   ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primaryFontColor,
+                      textStyle: style),
+                    onPressed: active[0] ? () => pressButton(0, 5) : null,
+                    child: Text('Submit', style: questionStyle, textAlign: TextAlign.center),
+                  ),
                 ]
               ),
             ),
@@ -278,40 +320,30 @@ class EnvironmentPage extends State<EnvironmentWidget> {
                           },
                         ),
                   ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primaryFontColor,
+                      textStyle: style),
+                    onPressed: active[1] ? () => pressButton(1, 5) : null,
+                    child: Text('Submit', style: questionStyle, textAlign: TextAlign.center),
+                  ),
                 ]
               ),
             ),
             SizedBox(height: bigSpace),
 
-            // Recycling Cloth
-            // Container(
-            //   width: 300.0,
-            //   decoration: BoxDecoration(
-            //     color: boxColor,
-            //     borderRadius: const BorderRadius.all(Radius.circular(20)),
-            //   ),
-            //   child: TextButton(
-            //     style: TextButton.styleFrom(
-            //       foregroundColor: AppColors.primaryFontColor,
-            //       textStyle: style),
-            //     onPressed: active[1] ? () => pressButton(1, 5, true) : null,
-            //     child: Text('I Donated Used Items', style: questionStyle, textAlign: TextAlign.center),
-            //   ),
-            // ),
-            // SizedBox(height: bigSpace),
-
             // Recycling Trash
             Container(
               width: 300.0,
               decoration: BoxDecoration(
-                color: boxColor,
+                color: active[2] ? boxColor : Colors.black45,
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
               ),
               child: TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.primaryFontColor,
                   textStyle: style),
-                onPressed: active[2] ? () => pressButton(2, 5, true) : null,
+                onPressed: active[2] ? () => pressButton(2, 5) : null,
                 child: Text('I Recycled Rubbish', style: questionStyle, textAlign: TextAlign.center),
               ),
             ),

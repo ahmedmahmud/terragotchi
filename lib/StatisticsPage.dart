@@ -3,17 +3,23 @@ import 'EnvironmentPage.dart';
 import 'colors.dart';
 import 'home.dart';
 
-class StatisticsWidget extends StatefulWidget {
-  const StatisticsWidget({super.key});
+class StatisticsWidget extends StatelessWidget {
+  UserData data;
 
-  @override
-  State<StatisticsWidget> createState() => StatisticsPage();
-}
+  StatisticsWidget({super.key, required this.data});
 
-class StatisticsPage extends State<StatisticsWidget> {
+  int getEnvValue() {return data.planetScore.round();}
+  int getHealthValue() {return data.healthScore.round();}
+  int getSleepValue() {return data.sleepScore.round();}
+
+  TextStyle style = TextStyle(fontFamily: 'Space Mono', 
+                              fontSize: 18, 
+                              fontWeight: FontWeight.bold, 
+                              color: AppColors.secondaryFontColor);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -34,18 +40,20 @@ class StatisticsPage extends State<StatisticsWidget> {
         bottomOpacity: 0.0,
         elevation: 0.0,
       ),
+      
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Environment score: ${EnvironmentPage.envScore.round()}',
-              style: const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
+              'Environment score: ${data.planetScore.round()}',
+              style: style,
+              textAlign: TextAlign.center,
             ),
             Slider(
-              value: EnvironmentPage.envScore,
+              value: data.planetScore.toDouble(),
               max: 100,
-              label: EnvironmentPage.envScore.round().toString(),
+              label: data.planetScore.round().toString(),
               onChanged: null,
             ),
           ],
