@@ -1,12 +1,16 @@
 {
-  "1": {
+  "28bb6a5a731ef65e0095f5b0513b162a1e524fa4": {
     "health": 0,
-    "planet": 5.99967,
-    "timestamp": 1675545388
+    "planet": 0,
+    "sleep": 0,
+    "timestamp": 1675567834
   },
-  "abc123": {
-    "health": 0,
-    "environment": 0
+  "current_id": 5,
+  "8bda89e4a7dda60fb15e052424675a63e28ea574": {
+    "health": 32.1303,
+    "planet": 32.1303,
+    "sleep": 0,
+    "timestamp": 1675574125
   },
-  "current_id": 11
+  "conv": {}
 }

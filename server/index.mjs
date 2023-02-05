@@ -19,6 +19,7 @@ const db = new Low(adapter)
 await db.read()
 db.data ||= {}
 db.data.current_id ||= 1
+db.data.conv ||= {}
 
 // ---- SERVER SETUP ---- //
 const app = express()
@@ -50,7 +51,7 @@ app.get('/generate_url', async (req, res) => {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log('🌍 Generated wigdet URL:', data, ref_id);
+      console.log(`🌍 Generated ${color.cyan(data.url)} for ${color.green(ref_id)}`);
       res.json({ ref_id, url: data.url })
     })
     .catch((error) => {
@@ -58,29 +59,43 @@ app.get('/generate_url', async (req, res) => {
     });
 })
 
-app.get('/get_values/:reference_id', (req, res) => {
-  res.json(db.data[req.params.reference_id])
+app.get('/get_values/:reference_id', async (req, res) => {
+  decay_scores(req.params.reference_id);
+  check_scores(req.params.reference_id);
+  let rounded = {
+    sleep: Math.floor(db.data[req.params.reference_id].sleep),
+    planet: Math.floor(db.data[req.params.reference_id].planet),
+    health: Math.floor(db.data[req.params.reference_id].health),
+  }
+  res.json(rounded)
+  console.log(`✉️ Sent scores [${color.gray(rounded.sleep)}, ${color.green(rounded.planet)}, ${color.red(rounded.health)}] to ${color.green(req.params.reference_id)}`);
+  await db.write()
 })
 
 // ---- POST HANDLERS ---- //
 app.post('/terra_hook', async (req, res) => {
   switch (req.body.type) {
     case "auth":
+      db.data.conv[req.body.user.user_id] = req.body.user.reference_id
       register_user(req.body.user.reference_id)
       break
     case "user_reauth":
       update_user(req.body.old_user.reference_id, req.body.new_user.reference_id)
       break
     case "activity":
-      decay_scores(req.body.user.reference_id)
-      load_activity_data(req.body.user.reference_id, req.body.MET_data)
+      ref_id = req.body.user.reference_id ? req.body.user.reference_id : conv[req.body.user.user_id]
+      decay_scores(ref_id)
+      load_activity_data(ref_id, req.body.MET_data)
+      check_scores(ref_id)
     case "sleep":
-      process_sleep_data(req.body.user.reference_id, req.body.data[0].sleep_durations_data.asleep)
+      ref_id = req.body.user.reference_id ? req.body.user.reference_id : conv[req.body.user.user_id]
+      decay_scores(ref_id)
+      process_sleep_data(ref_id, req.body.data[0].sleep_durations_data.asleep)
+      check_scores(ref_id)
       break
     default:
       break
   }
-  check_scores(req.body.user.reference_id)
   res.sendStatus(200)
   await db.write()
 })
@@ -133,12 +148,13 @@ let register_user = (uid) => {
     let time = moment().unix()
     console.log(time)
     db.data[uid] = {
-      "health": 0,
-      "planet": 0,
-      "sleep": 0,
+      "health": 50,
+      "planet": 50,
+      "sleep": 50,
       "timestamp": time
     }
-    console.log(`🔧 Successfully registered ${color.magenta(uid)} to the database!`)
+    console.log(`🔧 Successfully registered ${color.magenta(uid)} w/ to the database!`)
+    console.log(`${db.data.conv}`)
   } else {
     console.log(`🖇️ ${color.red(uid)} already exists! Ignoring...`)
   }
