@@ -1,25 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:terragotchi/sharedPrefs.dart';
 import 'EnvironmentPage.dart';
 import 'colors.dart';
 import 'home.dart';
 
 class StatisticsWidget extends StatelessWidget {
   UserData data;
+  Color boxColor = const Color.fromARGB(255, 88, 91, 112);
+  TextStyle questionStyle = TextStyle(
+      fontFamily: 'Space Mono',
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      color: AppColors.secondaryFontColor);
 
   StatisticsWidget({super.key, required this.data});
 
-  int getEnvValue() {return data.planetScore.round();}
-  int getHealthValue() {return data.healthScore.round();}
-  int getSleepValue() {return data.sleepScore.round();}
+  int getEnvValue() {
+    return data.planetScore.round();
+  }
 
-  TextStyle style = TextStyle(fontFamily: 'Space Mono', 
-                              fontSize: 18, 
-                              fontWeight: FontWeight.bold, 
-                              color: AppColors.secondaryFontColor);
+  int getHealthValue() {
+    return data.healthScore.round();
+  }
+
+  int getSleepValue() {
+    return data.sleepScore.round();
+  }
+
+  TextStyle style = TextStyle(
+      fontFamily: 'Space Mono',
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      color: AppColors.secondaryFontColor);
+
+  Future<void> pressButton() async {
+    await (await getData()).clear();
+    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+  }
 
   @override
   Widget build(BuildContext context) {
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -40,11 +62,13 @@ class StatisticsWidget extends StatelessWidget {
         bottomOpacity: 0.0,
         elevation: 0.0,
       ),
-      
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            const SizedBox(
+              height: 150,
+            ),
             Text(
               'Environment score: ${getEnvValue()}',
               style: style,
@@ -63,8 +87,9 @@ class StatisticsWidget extends StatelessWidget {
                 onChanged: null,
               ),
             ),
-            SizedBox(height: 10,),
-
+            SizedBox(
+              height: 10,
+            ),
             Text(
               'Health score: ${getHealthValue()}',
               style: style,
@@ -83,8 +108,9 @@ class StatisticsWidget extends StatelessWidget {
                 onChanged: null,
               ),
             ),
-            SizedBox(height: 10,),
-
+            const SizedBox(
+              height: 10,
+            ),
             Text(
               'Sleep score: ${getSleepValue()}',
               style: style,
@@ -101,6 +127,26 @@ class StatisticsWidget extends StatelessWidget {
                 max: 100,
                 label: getSleepValue().round().toString(),
                 onChanged: null,
+              ),
+            ),
+            const SizedBox(
+              height: 220,
+            ),
+            Container(
+              width: 300.0,
+              decoration: BoxDecoration(
+                color: boxColor,
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
+              ),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                    foregroundColor: AppColors.primaryFontColor,
+                    textStyle: style),
+                onPressed: () {
+                  pressButton();
+                },
+                child: Text('Reset',
+                    style: questionStyle, textAlign: TextAlign.center),
               ),
             ),
           ],
