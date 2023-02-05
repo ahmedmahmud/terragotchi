@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:terragotchi/sharedPrefs.dart';
-import 'AccountPage.dart';
+import 'LeaderboardPage.dart';
 import 'EnvironmentPage.dart';
 import 'StatisticsPage.dart';
 import 'colors.dart';
@@ -49,6 +49,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // 0 to 35 to process the scores
   // 35 to 60
   // 60 to 100
+  // 35 to 60
+  // 60 to 100
   // then render the stack
   // takes in a list of scores, each representing a category [0, 1 or 2]
   // [<score-env>, <score-health>, <score-sleep>]
@@ -73,7 +75,6 @@ class _MyHomePageState extends State<MyHomePage> {
   // gets overlayed image of current state
   Stack getImage(List<int?> scores) {
     return Stack(children: [
-      Image.asset('assets/images/earth/stars.png'),
       Image.asset(
           'assets/images/earth/${calulateScoreInt(scores[envIndex])}-Base.png'),
       Image.asset(
@@ -153,6 +154,12 @@ class _MyHomePageState extends State<MyHomePage> {
             loaded
                 ? getImage(
                     [data?.planetScore, data?.healthScore, data?.sleepScore])
+
+                // Text(
+                //     'Current total score: ${data?.sleepScore.round()}',
+                //     style:
+                //         const TextStyle(fontFamily: 'Space Mono', fontSize: 18),
+                //   )
                 : const Text(''),
           ],
         ),
@@ -188,7 +195,8 @@ class _MyHomePageState extends State<MyHomePage> {
           if (value == 2) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AccountWidget()),
+              MaterialPageRoute(
+                  builder: (context) => const LeaderboardWidget()),
             ).then((value) => setState(() {}));
           }
         },
@@ -203,7 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle_outlined),
-            label: 'account',
+            label: 'leaderboard',
           ),
         ],
       ),
