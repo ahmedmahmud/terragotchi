@@ -1,4 +1,5 @@
 // ---- IMPORTS ---- //
+import util from 'util'
 import express from 'express'
 import bodyParser from 'body-parser'
 import moment from 'moment'
@@ -18,7 +19,7 @@ const db = new Low(adapter)
 
 await db.read()
 db.data ||= {}
-db.data.current_id ||= 1
+db.data.current_id ||= 987656789865
 db.data.conv ||= {}
 
 // ---- SERVER SETUP ---- //
@@ -60,66 +61,106 @@ app.get('/generate_url', async (req, res) => {
 })
 
 app.get('/get_values/:reference_id', async (req, res) => {
-  decay_scores(req.params.reference_id);
-  check_scores(req.params.reference_id);
-  let rounded = {
-    sleep: Math.floor(db.data[req.params.reference_id].sleep),
-    planet: Math.floor(db.data[req.params.reference_id].planet),
-    health: Math.floor(db.data[req.params.reference_id].health),
+  if (req.params.reference_id in db.data) {
+    decay_scores(req.params.reference_id);
+    check_scores(req.params.reference_id);
+    let rounded = {
+      sleep: Math.floor(db.data[req.params.reference_id].sleep),
+      planet: Math.floor(db.data[req.params.reference_id].planet),
+      health: Math.floor(db.data[req.params.reference_id].health),
+    }
+    res.json(rounded)
+    console.log(`✉️ Sent scores [${color.gray(rounded.sleep)}, ${color.green(rounded.planet)}, ${color.red(rounded.health)}] to ${color.green(req.params.reference_id)}`);
+    await db.write()
+  } else {
+    console.log(`✉️ Failed send`);
   }
-  res.json(rounded)
-  console.log(`✉️ Sent scores [${color.gray(rounded.sleep)}, ${color.green(rounded.planet)}, ${color.red(rounded.health)}] to ${color.green(req.params.reference_id)}`);
+})
+
+app.get('/leaderboard', async (req, res) => {
+  let scores = []
+  for (const ref_id in db.data) {
+    if (ref_id != "conv" && ref_id != "current_id") {
+      decay_scores(ref_id)
+      check_scores(ref_id)
+      scores.push({ id: ref_id, score: Math.floor((db.data[ref_id].planet + db.data[ref_id].sleep + db.data[ref_id].health)/3) })
+    }
+  }
+
+  scores.sort(function(a, b) {
+    if (a.score < b.score) return -1;
+    if (a.score > b.score) return 1;
+    return 0;
+  }).reverse()
+
+  res.json(scores)
   await db.write()
 })
 
 // ---- POST HANDLERS ---- //
 app.post('/terra_hook', async (req, res) => {
-  switch (req.body.type) {
-    case "auth":
-      db.data.conv[req.body.user.user_id] = req.body.user.reference_id
-      register_user(req.body.user.reference_id)
-      break
-    case "user_reauth":
-      update_user(req.body.old_user.reference_id, req.body.new_user.reference_id)
-      break
-    case "activity":
-      ref_id = req.body.user.reference_id ? req.body.user.reference_id : conv[req.body.user.user_id]
-      decay_scores(ref_id)
-      load_activity_data(ref_id, req.body.MET_data)
-      check_scores(ref_id)
-    case "sleep":
-      ref_id = req.body.user.reference_id ? req.body.user.reference_id : conv[req.body.user.user_id]
-      decay_scores(ref_id)
-      process_sleep_data(ref_id, req.body.data[0].sleep_durations_data.asleep)
-      check_scores(ref_id)
-      break
-    default:
-      break
+  try {
+    let ref_id;
+    switch (req.body.type) {
+      case "auth":
+        db.data.conv[req.body.user.user_id] = req.body.user.reference_id
+        register_user(req.body.user.reference_id)
+        break
+      case "user_reauth":
+        update_user(req.body.old_user.reference_id, req.body.new_user.reference_id)
+        break
+      case "activity":
+        ref_id = req.body.user.reference_id ? req.body.user.reference_id : conv[req.body.user.user_id]
+        decay_scores(ref_id)
+        try {
+          console.log(util.inspect(req.body, false, null, true))
+          load_activity_data(ref_id, req.body.MET_data)
+        } catch (e) {
+          console.log("error: ", e);
+        }
+        check_scores(ref_id)
+      case "sleep":
+        ref_id = req.body.user.reference_id ? req.body.user.reference_id : conv[req.body.user.user_id]
+        decay_scores(ref_id)
+        process_sleep_data(ref_id, req.body.data[0].sleep_durations_data.asleep)
+        check_scores(ref_id)
+        break
+      default:
+        break
+    }
+  } catch (e) {
+    console.log("err: ", e)
   }
+
   res.sendStatus(200)
   await db.write()
 })
 
 app.post('/send_action/:reference_id', async (req, res) => {
-  decay_scores(req.params.reference_id)
-  switch (req.body.type) {
-    case "recycle":
-      inc_recycle(req.params.reference_id)
-      res.sendStatus(200)
-      break
-    case "journey":
-      update_transport(req.params.reference_id, req.body.mode)
-      res.sendStatus(200)
-      break
-    case "meal":
-      update_meal(req.params.reference_id, req.body.category)
-      res.sendStatus(200)
-      break
-    default:
-      res.sendStatus(404)
-      break
+  console.log(util.inspect(req.body, false, null, true))
+  try {
+    decay_scores(req.params.reference_id)
+    switch (req.body.type) {
+      case "recycle":
+        inc_recycle(req.params.reference_id)
+        res.sendStatus(200)
+        break
+      case "journey":
+        update_transport(req.params.reference_id, req.body.mode)
+        res.sendStatus(200)
+        break
+      case "meal":
+        update_meal(req.params.reference_id, req.body.category)
+        res.sendStatus(200)
+        break
+      default:
+        res.sendStatus(404)
+        break
+    }
+    check_scores(req.params.reference_id)
+  } catch (e) {
+    console.log("err: ", e)
   }
-  check_scores(req.params.reference_id)
   await db.write()
 })
 
@@ -161,7 +202,7 @@ let register_user = (uid) => {
 }
 
 let update_user = (old_uid, new_uid) => {
-  if (old_uid in db.data && !(new_uid in db.data)) {
+  if (old_uid in db.data) {
     db.data[new_uid] = db.data[old_uid];
     delete db.data[old_uid];
     console.log(`🔧 User re-registered from ${color.red(old_uid)} to ${color.magenta(new_uid)}!`)
