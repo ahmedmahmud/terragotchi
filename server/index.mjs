@@ -29,6 +29,12 @@ const port = 3000
 // ---- MIDDLEWARE ---- //
 app.use(bodyParser.json())
 
+let config = {
+  planetDecay: 0.01,
+  healthDecay: 0.001,
+  sleepDecay: 0.01,
+}
+
 // ---- GET HANDLERS ---- //
 app.get('/', (req, res) => {
   res.send('🌍 Terragotchi 🌍')
@@ -169,9 +175,9 @@ let decay_scores = (uid) => {
   let user = db.data[uid]
   let time = moment().unix()
   let delta = Math.max(time - db.data[uid].timestamp, 0)
-  user.health = Math.max(user.health - delta * 0.0001, 0)
-  user.planet = Math.max(user.planet - delta * 0.0001, 0)
-  user.sleep = Math.max(user.sleep - delta * 0.0001, 0)
+  user.health = Math.max(user.health - delta * config.healthDecay, 0)
+  user.planet = Math.max(user.planet - delta * config.planetDecay, 0)
+  user.sleep = Math.max(user.sleep - delta * config.sleepDecay, 0)
 }
 
 let check_scores = (uid) => {
@@ -306,5 +312,5 @@ const color = {
 
 // ---- SERVER LISTEN ---- //
 app.listen(port, () => {
-  console.log(`🚀 terragatchi server running on ${color.green(port)}!`)
+  console.log(`🚀 terragotchi server running on ${color.green(port)}!`)
 })
