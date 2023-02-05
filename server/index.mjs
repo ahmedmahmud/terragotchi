@@ -130,7 +130,7 @@ let decay_scores = (uid) => {
   let delta = Math.max(time - db.data[uid].timestamp, 0)
   user.health = Math.max(user.health - delta * 0.0001, 0)
   user.planet = Math.max(user.planet - delta * 0.0001, 0)
-  user.sleep = Math.max(user.sleep - delta * 0.001, 0)
+  user.sleep = Math.max(user.sleep - delta * 0.0001, 0)
 }
 
 let check_scores = (uid) => {
